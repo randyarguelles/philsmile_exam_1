@@ -1,0 +1,22 @@
+{% extends "exam_1/base.html" %}
+{% block title %}Welcome to Django Bookmarks{% endblock %}
+{% block head %}Welcome to Django Bookmarks{% endblock %}
+{% block content %}
+		{% if user.username %}
+			<p>Welcome {{ user.username }}!</p>
+			<h1>	Here is a List of Quizzes Available</h1>
+			<ul>
+			{% for quiz in list_of_quizzes %}
+				
+				<li><h2><a href="{% url 'quiz' quiz.id %}"> {{quiz}}</h2></li>
+			
+				
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p>Welcome anonymous user!
+				You need to <a href="login/">login</a>
+				or <a href="register/">register</a>
+				before you can view,add and edit your details.</p>
+		{% endif %}
+{% endblock %}

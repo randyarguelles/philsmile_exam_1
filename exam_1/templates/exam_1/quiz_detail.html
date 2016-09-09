@@ -1,0 +1,27 @@
+{% extends "exam_1/base.html" %}
+
+{% block content %}
+<p>{{selected_date}}
+
+  
+    <h1>Hello {{user.username}} </h1>
+    <form method="POST" class="post-form">{% csrf_token %}
+	
+		{% for key, form in form_dic.items %}
+			{{form.0.question_text.label_tag}}
+			{{form.0.question_text}}
+			<p></p>
+			{% for c in form.1 %}
+		
+				 <input type="radio" name={{key}} value={{c.id}}> {{c}}<br>
+			
+			{% endfor %}
+		{% endfor %}
+	      <input type="hidden" name="date_hidden" value={{selected_date}}>
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
+
+	
+
+	
+{% endblock %}
