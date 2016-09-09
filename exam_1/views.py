@@ -1,5 +1,5 @@
 from django.shortcuts import render, render_to_response
-from .forms import RegistrationForm, QuizForm, QuestionForm, UserInfoForm
+from .forms import RegistrationForm, QuestionForm
 from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template import RequestContext
@@ -42,7 +42,6 @@ def register_page(request):
 
 def index(request):
     list_of_quizzes = Quiz.objects.all().order_by('created_date')
-    print(list_of_quizzes)
     # ~ return render_to_response(
     # ~ 'polls/main_page.html',
     # ~ list_of_quizzes
@@ -60,13 +59,10 @@ def quiz_detail(request, pk):
 
         for items in test:
             my_key = 'form_' + str(items.id)
-            print items.id,"items hahs"
             if my_key in request.POST:
-                print my_key ,"ANSWER" ,request.POST[my_key]
-
                 UserSession.objects.create(
-                    user=request.user, 
-                    quiz=quiz, 
+                    user=request.user,
+                    quiz=quiz,
                     question=items,
                     user_answer=Choice.objects.get(id=request.POST[my_key]),
                     user_score=100)
@@ -81,11 +77,10 @@ def quiz_detail(request, pk):
     for num, test_form in enumerate(test):
         # ~ form = QuestionForm(instance=test)
         choices = Choice.objects.filter(question=test_form.id)
-        print choices,'id ng test_form'
         form_dic['form_' + str(test_form.id)] = [QuestionForm(instance=test_form), choices]
     # ~ return HttpResponse('test %s'%pk)
-    print(form_dic)
     return render(request, 'exam_1/quiz_detail.html', {'form_dic': form_dic})
+
 
 def results(request, pk):
     question_list = Question.objects.filter(quiz=pk)
@@ -93,5 +88,4 @@ def results(request, pk):
     for question_item in question_list:
         list_of_users_info.append(UserSession.objects.filter(user=request.user,question=question_item))
 
-
-    return render(request, 'exam_1/results.html',{'list_of_users_info': list_of_users_info})
+    return render(request, 'exam_1/results.html', {'list_of_users_info': list_of_users_info})

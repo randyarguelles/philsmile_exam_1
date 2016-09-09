@@ -12,8 +12,8 @@ urlpatterns = [
     url(r'^register/success/$', TemplateView.as_view(
         template_name="registration/register_success.html")),
     # Start Quiz dito
-    url(r'^quiz/(?P<pk>[0-9]+)/$', views.quiz_detail,  name='quiz'),
-    url(r'^results/(?P<pk>[0-9]+)$', views.results,  name='results'),
+    url(r'^quiz/(?P<pk>[0-9]+)/$', views.quiz_detail, name='quiz'),
+    url(r'^results/(?P<pk>[0-9]+)$', views.results, name='results'),
 
 
 ]
