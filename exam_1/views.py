@@ -4,6 +4,8 @@ from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.contrib.auth.models import User
+from django.views import generic
+from django.views.generic.base import View
 from .models import Question, Choice, Quiz, UserSession
 from django.contrib.auth import logout
 # Create your views here.
@@ -40,7 +42,17 @@ def register_page(request):
         )
 
 
-def index(request):
+class IndexView(generic.ListView):
+    template_name = 'exam_1/main_page.html'
+    context_object_name = 'list_of_quizzes'
+
+    def get_queryset(self):
+        """Return the last five published questions."""
+        # return Question.objects.order_by('-pub_date')[:5]
+        return Quiz.objects.all().order_by('created_date')
+
+
+def old_index(request):
     list_of_quizzes = Quiz.objects.all().order_by('created_date')
     # ~ return render_to_response(
     # ~ 'polls/main_page.html',
@@ -51,7 +63,40 @@ def index(request):
         'exam_1/main_page.html', {'list_of_quizzes': list_of_quizzes})
 
 
-def quiz_detail(request, pk):
+class QuizDetail(View):
+    def get(self, request, pk):
+        # <view logic>
+        test = Question.objects.filter(quiz=pk)
+
+        print(test)
+        form_dic = {}
+        for num, test_form in enumerate(test):
+            # ~ form = QuestionForm(instance=test)
+            choices = Choice.objects.filter(question=test_form.id)
+            form_dic['form_' + str(test_form.id)] = [QuestionForm(
+                instance=test_form), choices]
+        # ~ return HttpResponse('test %s'%pk)
+        return render(request, 'exam_1/quiz_detail.html', {
+            'form_dic': form_dic})
+
+    def post(self, request, pk):
+        quiz = get_object_or_404(Quiz, pk=pk)
+        test = Question.objects.filter(quiz=pk)
+    
+        for items in test:
+            my_key = 'form_' + str(items.id)
+            if my_key in request.POST:
+                UserSession.objects.create(
+                    user=request.user,
+                    quiz=quiz,
+                    question=items,
+                    user_answer=Choice.objects.get(id=request.POST[my_key]),
+                    user_score=100)
+                print "nag save!!"
+        return redirect('results', pk=pk)
+
+
+def old_quiz_detail(request, pk):
     quiz = get_object_or_404(Quiz, pk=pk)
     test = Question.objects.filter(quiz=pk)
     # print request['form_1'], "may laman ba"
@@ -77,15 +122,43 @@ def quiz_detail(request, pk):
     for num, test_form in enumerate(test):
         # ~ form = QuestionForm(instance=test)
         choices = Choice.objects.filter(question=test_form.id)
-        form_dic['form_' + str(test_form.id)] = [QuestionForm(instance=test_form), choices]
+        form_dic['form_' + str(test_form.id)] = [QuestionForm(
+            instance=test_form), choices]
     # ~ return HttpResponse('test %s'%pk)
     return render(request, 'exam_1/quiz_detail.html', {'form_dic': form_dic})
 
 
-def results(request, pk):
+class ResultsView(generic.DetailView):
+    model = Question
+    context_object_name = 'list_of_users_info'
+    template_name = 'exam_1/results.html'
+
+    def get_context_data(self, **kwargs):
+        data = super(ResultsView, self).get_context_data(**kwargs)
+        question_list = Question.objects.filter(quiz=self.kwargs['pk'])
+        list_of_users_info = []
+        for question_item in question_list:
+            list_of_users_info.append(UserSession.objects.filter(
+                user=self.request.user,
+                question=question_item))
+
+        data['list_of_users_info'] = list_of_users_info
+        return data
+    # def get_queryset(self):
+    #     question_list = Question.objects.filter(quiz=self.kwargs['pk'])
+    #     list_of_users_info = []
+    #     for question_item in question_list:
+    #         list_of_users_info.append(UserSession.objects.filter(user=self.request.user,question=question_item))
+
+    #     return list_of_users_info
+
+
+def oldresults(request, pk):
     question_list = Question.objects.filter(quiz=pk)
     list_of_users_info = []
     for question_item in question_list:
-        list_of_users_info.append(UserSession.objects.filter(user=request.user,question=question_item))
+        list_of_users_info.append(UserSession.objects.filter(
+            user=request.user, question=question_item))
 
-    return render(request, 'exam_1/results.html', {'list_of_users_info': list_of_users_info})
+    return render(request, 'exam_1/results.html', {
+        'list_of_users_info': list_of_users_info})

@@ -5,15 +5,20 @@ from . import views
 # from django.views.generic import TemplateView
 # from django.contrib.auth.views import login
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^login/$', login, name='login_time'),
     url(r'^logout/$', views.logout_page),
     url(r'^register/$', views.register_page),
     url(r'^register/success/$', TemplateView.as_view(
         template_name="registration/register_success.html")),
     # Start Quiz dito
-    url(r'^quiz/(?P<pk>[0-9]+)/$', views.quiz_detail, name='quiz'),
-    url(r'^results/(?P<pk>[0-9]+)$', views.results, name='results'),
+    # url(r'^quiz/(?P<pk>[0-9]+)/$', views.quiz_detail, name='quiz'),
+    url(r'^results/(?P<pk>[0-9]+)$', views.ResultsView.as_view(),
+        name='results'),
+    url(r'^quiz/(?P<pk>[0-9]+)$', views.QuizDetail.as_view(), name='quiz'),
+
+    # url(r'^results/(?P<pk>[0-9]+)$', views.results, name='results'),
+
 
 
 ]
