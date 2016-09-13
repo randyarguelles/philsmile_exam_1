@@ -2,17 +2,16 @@
 {% block title %}User Login{% endblock %}
 {% block head %}User Login{% endblock %}
 {% block content %}
-{% for users_info in list_of_users_info %}
-	{% for user_info in users_info %}
-			<p>Question is {{user_info.question}} </p>
-			<p>Your Answer is <b>{{user_info.user_answer}}</b>
-			{% if user_info.is_correct %}
-				<p> Correct! </p>
-			{% else %}
-				<p>Incorrect! </p>
-				<p>Answer is <b>{{user_info.correct_answer}}</b>
-			{% endif %}
-	{% endfor %}
+{% for users_info in new_data %}
+	
+	<p>Question is {{users_info.0}} </p>
+	<p>Your Answer is <b>{{users_info.1}}</b>
+	{% if users_info.2 %}
+		<p> Correct! </p>
+	{% else %}
+		<p>Incorrect! </p>
+	{% endif %}
+	
 
 {% endfor %}
 

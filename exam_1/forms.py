@@ -11,8 +11,8 @@ class UserInfoForm(forms.ModelForm):
             'user',
             'quiz',
             'question',
-            'user_answer',
-            'user_score',
+            # 'user_answer',
+            # 'user_score',
             )
 
 
